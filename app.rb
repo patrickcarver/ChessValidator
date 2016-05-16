@@ -5,8 +5,10 @@ module PatrickCarver
     module ChessValidator
       class Piece
         attr_reader :player, :name
+        attr_accessor :moves
 
         def initialize(data)
+          @moves = []
           @player, @name = data.split ''
 
           if @player == '-' && @name == '-'
@@ -38,10 +40,37 @@ module PatrickCarver
         end
 
         def run(board_file:, moves_file:, output_file:)
-          
           board = BoardParser.run board_file
-          pp board
 
+          board.each_with_index do |row, y|
+            row.each_with_index do |piece, x|
+              candidate_moves = []
+
+              if piece.name == 'K'
+                row_above = y - 1
+                row_below = y + 1
+
+                col_left =  x - 1
+                col_right = x + 1
+
+                row_above.upto row_below do |r|
+                  next if r < 0 || r > 7
+
+                  col_left.upto col_right do |c|
+                    next if c < 0 || c > 7
+                    next if c == x && r == y
+                    
+                    candidate = board[c][r]
+                    
+                    if candidate.player != piece.player
+                      candidate_moves.push [c, r]
+                    end
+
+                  end
+                end
+              end
+            end
+          end
         end
       end
     end
