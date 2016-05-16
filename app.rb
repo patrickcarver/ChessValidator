@@ -46,18 +46,22 @@ module PatrickCarver
             row.each_with_index do |piece, x|
               candidate_moves = []
 
+              row_above = y - 1
+              row_below = y + 1
+
+              col_left =  x - 1
+              col_right = x + 1
+
+              ############################################
+              # King
+              # TODO: needs to deal with not moving King to a space where he can be put in check.
+
               if piece.name == 'K'
-                row_above = y - 1
-                row_below = y + 1
-
-                col_left =  x - 1
-                col_right = x + 1
-
                 row_above.upto row_below do |r|
-                  next if r < 0 || r > 7
+                  next if r < 0 || r > 8
 
                   col_left.upto col_right do |c|
-                    next if c < 0 || c > 7
+                    next if c < 0 || c > 8
                     next if c == x && r == y
                     
                     candidate = board[c][r]
@@ -65,10 +69,38 @@ module PatrickCarver
                     if candidate.player != piece.player
                       candidate_moves.push [c, r]
                     end
-
                   end
                 end
               end
+
+              ############################################
+
+              if piece.name == 'P'
+                if piece.player == 'b'
+                  
+
+                  if row_below < 8
+                    space_ahead = board[x][row_below]
+                    
+                    if space_ahead.player == "NONE"
+                      candidate_moves.push [x, row_below]
+                    end
+
+                    
+
+                    space_below_right
+
+                  end
+                end
+
+                if piece.player == 'w'
+                  row_above = y + 1
+
+
+                end
+              end
+
+              ############################################              
             end
           end
         end
