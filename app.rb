@@ -14,13 +14,12 @@ module PatrickCarver
           if @player == '-' && @name == '-'
             @player = "NONE"
             @name = "NONE"
-          end 
+          end
         end
       end
 
       module BoardParser
         def self.run(file_name)
-          puts file_name
           board = []
 
           File.open file_name, "r" do |f|
@@ -63,34 +62,66 @@ module PatrickCarver
                   col_left.upto col_right do |c|
                     next if c < 0 || c > 8
                     next if c == x && r == y
-                    
+
                     candidate = board[c][r]
-                    
+
                     if candidate.player != piece.player
                       candidate_moves.push [c, r]
                     end
                   end
                 end
+
+                piece.moves.push candidate_moves
               end
 
               ############################################
 
               if piece.name == 'P'
                 if piece.player == 'b'
-                  
+                  puts "piece #{piece.player} #{x} #{y}"
 
                   if row_below < 8
-                    space_ahead = board[x][row_below]
-                    
+                    space_ahead = board[row_below][x]
+
+                    puts "ahead #{space_ahead.player} #{space_ahead.name} #{x} #{row_below}"
+
                     if space_ahead.player == "NONE"
                       candidate_moves.push [x, row_below]
+
+                      # on home row
+                      if y == 1
+                        two_spaces_ahead = board[row_below + 1][x]
+
+                        if two_spaces_ahead.player == "NONE"
+                          candidate_moves.push [x, row_below + 1]
+                        end
+                      end
                     end
 
-                    
+                    # add if opposing piece diagonal in front of piece
 
-                    space_below_right
+                    # left
+                    if x != 0
+                      candidate = board[row_below][col_left]
+
+                      if candidate.player == 'w'
+                        candidate_moves.push [col_left, row_below]
+                      end
+                    end
+
+                    # right
+                    if x != 7
+                      candidate = board[row_below][col_right]
+
+                      if candidate.player == 'w'
+                        candidate_moves.push [col_right, row_below]
+                      end
+                    end
+
 
                   end
+                  puts candidate_moves
+
                 end
 
                 if piece.player == 'w'
@@ -100,7 +131,7 @@ module PatrickCarver
                 end
               end
 
-              ############################################              
+              ############################################
             end
           end
         end
